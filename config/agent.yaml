@@ -1,0 +1,36 @@
+# Agent Manifest — AgentRegistry entry point
+# AgentRegistry reads every key below at ROOT level; do not nest under agent:.
+#
+# STATIC MANIFEST ONLY. Runtime-tunable parameters (max_retry / timeout_seconds /
+# budget_usd / memory_enabled / hitl.* / domain thresholds) live in
+# config/config.yaml; the registry reads only the static manifest from here.
+id: "ENE-C2-123"
+name: "SupplyDataQualityPrecedentAgent"
+namespace: "ene"
+version: "1.0.0"
+enabled: true
+category: "Cat 2"
+# Static generation contract (review-criteria: deterministic | llm・未宣言は deterministic 既定).
+# claim / missing_information / confirmation_question の文面は config["llm"] が起草する。
+# 実 LLM 1回転（work/scripts/mrb_live_llm_check.py）で呼び出し 1 回・非空の cards を実測済み
+# （結果は docs/03_test_spec.md）。
+generation_mode: "llm"  # deterministic | llm
+industry: "ENE"
+
+# L1 base class (see docs/02_design.md §1)
+base_type: "AgentBaseGraph"
+
+# Entry point — single dotted import path (module.Class).
+class: "src.graph.SupplyDataQualityPrecedentGraph"
+
+# Static manifest requirements
+# secrets: [] on purpose — declared secrets are verified at process startup by
+# require_at_compile(), and the SDK DotenvProvider reads only env/ dotenv files
+# (never process env). The customer KB DSN is needed per request, not at startup,
+# so declaring it would make the process unbootable in STG. See design §12-1.
+requires:
+  extras: []
+  secrets: []
+
+# Security
+required_trust_level: "VERIFIED_EXTERNAL"

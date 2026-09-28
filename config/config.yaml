@@ -1,0 +1,50 @@
+# Runtime configuration — ENE-C2-123
+# Runtime-tunable parameters only. The static manifest lives in config/agent.yaml
+# (manifest / runtime-config split). Values previously held in the manifest's
+# `agent.config` block moved here unchanged during the AgentRegistry manifest
+# migration; no value was altered.
+
+# --- backbone ---
+max_retry: 3
+timeout_seconds: 60
+budget_usd: 1.00
+memory_enabled: false
+
+# HITL is not adopted — see docs/01_proposal.md "HITL Gate" for the four-question
+# rationale. The proof-of-boundary HITL test is auto-waived for a non-HITL agent,
+# and its stub reads this file, so the declaration lives here.
+hitl:
+  enabled: false
+
+# --- candidate narrowing / conflict predicate (design §5) ---
+candidate_top_k: 8
+candidate_hard_cap: 24
+conflict_min_distinct_verdicts: 2
+conflict_min_minority_count: 1
+
+# --- review priority derivation (design §7-3) ---
+priority_weight_verdict: 2
+priority_weight_missing: 1
+priority_weight_candidates: 1
+priority_high_threshold: 4
+priority_medium_threshold: 2
+
+# --- intake limits (design §11) ---
+payload_ttl_seconds: 900
+max_exceptions_per_invoke: 50
+
+# --- free-text guards for LLM-authored claim statements (design §8-1) ---
+statement_max_chars: 400
+verbatim_guard_chars: 60
+
+# --- evidence registry floor + index text quality gate (design §6-2, §11-3) ---
+min_span_chars: 8
+min_body_chars: 20
+max_body_chars: 4000
+max_mojibake_ratio: 0.005
+max_control_char_ratio: 0.001
+min_readable_char_ratio: 0.80
+
+# --- customer deployment vocabulary. Replace these values during onboarding. ---
+exception_categories: ["missing", "duplicate", "outlier", "timeliness", "completeness", "consistency", "validity", "other"]
+verdict_codes: ["accepted", "rejected", "approved", "denied", "allow", "deny", "pass", "fail", "waived", "exception"]
